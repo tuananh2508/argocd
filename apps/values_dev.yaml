@@ -2,7 +2,6 @@ service:
 - name: argocd
   application:
   - argo-cd
-  - django
   create_ns: false
 
 apps: true
