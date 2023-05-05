@@ -1,0 +1,40 @@
+{{ if .Values.apps }}
+{{ $cluster := .Values.cluster.server }}
+{{ $env := .Values.cluster.name }}
+{{- range $service := .Values.service }}
+{{- range .application}}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application 
+metadata:
+   {{ if eq . "argo-cd" }}
+   name: argo-cd
+   {{ else }}
+   name: {{ . }}-{{ $env }}
+   {{ end }}
+   namespace: argocd
+   finalizers:
+   - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: {{ $service.name }}
+    server: {{ $cluster }}
+  project: default
+  source: 
+    helm:
+      valueFiles:
+      - values_{{ $env }}.yaml
+    repoURL: https://github.com/tuananh2508/argocd
+    path: charts/{{ . }}
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    {{ if $service.create_ns }}
+    syncOptions:
+      - CreateNamespace=true
+    {{ end }}
+{{- end }}
+{{- end }}
+{{- end }}

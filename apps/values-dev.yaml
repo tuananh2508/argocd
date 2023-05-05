@@ -1,0 +1,11 @@
+service:
+- name: argocd
+  application:
+  - argo-cd
+  create_ns: false
+
+apps: true
+
+cluster: 
+  server: https://kubernetes.default.svc
+  name: dev
